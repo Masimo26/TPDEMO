@@ -6,15 +6,33 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 
 def index_page(request):
+
     return render(request, 'index.html')
 
 # esta función obtiene 2 listados que corresponden a las imágenes de la API y los favoritos del usuario, y los usa para dibujar el correspondiente template.
 # si el opcional de favoritos no está desarrollado, devuelve un listado vacío.
-def home(request):
-    images = []
-    favourite_list = []
+import requests
 
-    return render(request, 'home.html', { 'images': images, 'favourite_list': favourite_list })
+def home(request):
+    DEFAULT_PAGE = '1'
+    link = f'https://rickandmortyapi.com/api/character?page={DEFAULT_PAGE}'
+    
+
+    contenido = requests.get(link)
+    data = contenido.json() 
+
+   
+    images = [character['image'] for character in data['results']]
+
+
+    favourite_list = [
+        'https://rickandmortyapi.com/api/character/1',
+        'https://rickandmortyapi.com/api/character/3'
+    ]
+    
+    # Enviamos las listas a la plantilla
+    return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
+
 
 def search(request):
     search_msg = request.POST.get('query', '')
