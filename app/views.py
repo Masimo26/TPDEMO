@@ -7,8 +7,8 @@ from django.contrib.auth import logout
 
 
 def home_view(request):
-    input_query = request.POST.get('query', None)  # Obtén el término de búsqueda del formulario
-    images = services.getAllImages(input_query)  # Llama a la función para obtener las imágenes
+    consulta = request.POST.get('query', None)  
+    images = services.getAllImages(consulta)  
     print(images)
     return render(request, 'home.html', {'images': images})
 def index_page(request):
@@ -20,8 +20,8 @@ def index_page(request):
 import requests
 
 def home(request):
-    DEFAULT_PAGE = '1'
-    link = f'https://rickandmortyapi.com/api/character?page={DEFAULT_PAGE}'
+    Pagina_default = '1'
+    link = f'https://rickandmortyapi.com/api/character?page={Pagina_default}'
     
 
     contenido = requests.get(link)
