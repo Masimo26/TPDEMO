@@ -5,6 +5,12 @@ from .layers.services import services
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 
+
+def home_view(request):
+    input_query = request.POST.get('query', None)  # Obtén el término de búsqueda del formulario
+    images = services.getAllImages(input_query)  # Llama a la función para obtener las imágenes
+    print(images)
+    return render(request, 'home.html', {'images': images})
 def index_page(request):
 
     return render(request, 'index.html')
@@ -22,7 +28,13 @@ def home(request):
     data = contenido.json() 
 
    
-    images = [character['image'] for character in data['results']]
+    images = [{
+        'name': character['name'],
+        'url': character['image'],
+        'status': character['status'],
+        'last_location': character['location']['name'] if character['location'] else 'Desconocido',
+        'first_seen': character['episode'][0] if character['episode'] else 'Desconocido'
+    } for character in data['results']]
 
 
     favourite_list = [
@@ -30,7 +42,7 @@ def home(request):
         'https://rickandmortyapi.com/api/character/3'
     ]
     
-    # Enviamos las listas a la plantilla
+
     return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
 
 
