@@ -29,18 +29,16 @@ def home(request):
 
    
     images = [{
-        'name': character['name'],
+        'nombre': character['name'],
         'url': character['image'],
-        'status': character['status'],
-        'last_location': character['location']['name'] if character['location'] else 'Desconocido',
-        'first_seen': character['episode'][0] if character['episode'] else 'Desconocido'
+        'estado': character['status'],
+        'ultima_ubicacion': character['location']['name'] if character['location'] else 'Desconocido',
+        'episodio_inicial': character['origin']['name'] if character['origin'] else 'Desconocido'
+
     } for character in data['results']]
 
 
-    favourite_list = [
-        'https://rickandmortyapi.com/api/character/1',
-        'https://rickandmortyapi.com/api/character/3'
-    ]
+    favourite_list = []
     
 
     return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})

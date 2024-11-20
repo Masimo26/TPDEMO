@@ -20,16 +20,17 @@ def getAllImages(input=None):
     images = []  
     
     for personaje in json_collection:
+
         card = {
-            'name': personaje.get('name'),
-            'url': personaje.get('image'),
-            'status': personaje.get('status'),
-            'last_location': personaje.get('location', {}).get('name', 'Desconocido'),
-            'first_seen': personaje.get('origin', {}).get('name', 'Desconocido')[0]
-        }
+        'nombre': personaje.get('name'),
+        'url': personaje.get('image'),
+        'estado': personaje.get('status'),
+        'ultima_ubicacion': personaje.get('location', {}).get('name', 'Desconocido'),
+        'episodio_inicial': personaje.get('origin', {}).get('name', 'Desconocido')  # Cambiado a origen
+    }
    
         if input:
-            if input.lower() in card['name'].lower():
+            if input.lower() in card['nombre'].lower():
                 images.append(card)
         else:
             images.append(card)
