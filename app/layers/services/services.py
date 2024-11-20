@@ -3,15 +3,40 @@
 from ..persistence import repositories
 from ..utilities import translator
 from django.contrib.auth import get_user
+import requests
+
+def conseguirimagenesAPI():
+    url = "https://rickandmortyapi.com/api/character" 
+    contenido = requests.get(url)
+    if contenido.status_code == 200:
+        return contenido.json().get('results', []) 
+    return []
+
 
 def getAllImages(input=None):
-    # obtiene un listado de datos "crudos" desde la API, usando a transport.py.
-    json_collection = []
+    
+    json_collection = repositories.conseguirimagenesAPI() 
+    
+    images = []  
+    
+    for personaje in json_collection:
 
-    # recorre cada dato crudo de la colección anterior, lo convierte en una Card y lo agrega a images.
-    images = []
-
+        card = {
+        'nombre': personaje.get('name'),
+        'url': personaje.get('image'),
+        'estado': personaje.get('status'),
+        'ultima_ubicacion': personaje.get('location', {}).get('name', 'Desconocido'),
+        'episodio_inicial': personaje.get('origin', {}).get('name', 'Desconocido')  # Cambiado a origen
+    }
+   
+        if input:
+            if input.lower() in card['nombre'].lower():
+                images.append(card)
+        else:
+            images.append(card)
+    
     return images
+
 
 # añadir favoritos (usado desde el template 'home.html')
 def saveFavourite(request):
