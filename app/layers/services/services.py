@@ -26,7 +26,7 @@ def getAllImages(input=None):
         'url': personaje.get('image'),
         'estado': personaje.get('status'),
         'ultima_ubicacion': personaje.get('location', {}).get('name', 'Desconocido'),
-        'episodio_inicial': personaje.get('origin', {}).get('name', 'Desconocido')  # Cambiado a origen
+        'episodio_inicial': personaje.get('origin', {}).get('name', 'Desconocido')  
     }
    
         if input:
