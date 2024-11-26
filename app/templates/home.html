@@ -19,30 +19,41 @@
 
     <div class="d-flex justify-content-end" style="margin-bottom: 1%; margin-right: 2rem;">
         <!-- Selector de página -->
-        <nav aria-label="...">
+        <nav aria-label="Paginación">
             <ul class="pagination">
-                <li class="page-item disabled">
-                    <a class="page-link">⬅</a>
-                </li>
-                <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">➡</a>
-                </li>
+                {% if prev_page %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ prev_page }}">⬅</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link">⬅</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_range %}
+                    <li class="page-item {% if current_page == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                
+                {% if next_page %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ next_page }}">➡</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link">➡</a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
     </div>
-
     <div class="d-flex justify-content-center" style="margin-bottom: 1%">
         <!-- Buscador del sitio -->
-        <form class="d-flex" action="{% url 'home' %}" method="POST">
+        <form class="d-flex" action="{% url 'search' %}" method="POST">
             {% csrf_token %}
-            <input class="form-control me-2" type="search" name="query" placeholder="Escribí una palabra" aria-label="Search">
+            <input class="form-control me-2" type="search" name="query" placeholder="Escribí una palabra" value="{{ query }}" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Buscar</button>
         </form>        
     </div>
@@ -60,7 +71,7 @@
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h3 class="card-title">{{ img.name }}</h3>
+                                <h3 class="card-title">{{ img.nombre }}</h3>
                                 <p class="card-text">
                                     <strong>
                                         {% if img.estado == 'Alive' %} 🟢 {{ img.estado }}

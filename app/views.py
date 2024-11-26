@@ -43,17 +43,35 @@ def home(request):
 
     return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
 
-
 def search(request):
-    search_msg = request.POST.get('query', '')
+    search_msg = request.POST.get('query', '').strip()  # Obtener y limpiar el texto ingresado
 
-    # si el texto ingresado no es vacío, trae las imágenes y favoritos desde services.py,
-    # y luego renderiza el template (similar a home).
-    if (search_msg != ''):
-        pass
+    if search_msg:  # Si el texto no está vacío
+        # Construir el link de búsqueda en la API
+        link = f'https://rickandmortyapi.com/api/character/?name={search_msg}'
+
+        try:
+            contenido = requests.get(link)
+            contenido.raise_for_status()  # Lanzar excepción si hay error en la API
+            data = contenido.json()
+
+            if 'results' in data:
+                images = [{
+                    'nombre': character['name'],
+                    'url': character['image'],
+                    'estado': character['status'],
+                    'ultima_ubicacion': character['location']['name'] if character['location'] else 'Desconocido',
+                    'episodio_inicial': character['origin']['name'] if character['origin'] else 'Desconocido'
+                } for character in data['results']]
+            else:
+                images = []  # Si no hay resultados, la lista será vacía
+        except requests.exceptions.RequestException:
+            images = []  # Manejo de errores en caso de falla en la API
+
+        return render(request, 'home.html', {'images': images, 'query': search_msg})
     else:
+        # Si no se ingresó texto, redirigir a `home` para mostrar todo
         return redirect('home')
-
 
 # Estas funciones se usan cuando el usuario está logueado en la aplicación.
 @login_required
@@ -71,4 +89,5 @@ def deleteFavourite(request):
 
 @login_required
 def exit(request):
-    pass
+    logout(request)  
+    return redirect('login')
