@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 {% extends 'header.html' %} 
+=======
+{% extends 'header.html' %}
+>>>>>>> 5e876d0f40ac7faadccc567c7875634633d27533
 {% block content %}
 <main>
     <h1 class="text-center">Buscador Rick & Morty</h1>
@@ -19,6 +23,7 @@
 
     <div class="d-flex justify-content-end" style="margin-bottom: 1%; margin-right: 2rem;">
         <!-- Selector de página -->
+<<<<<<< HEAD
         <nav aria-label="Paginación">
             <ul class="pagination">
                 {% if prev_page %}
@@ -55,6 +60,32 @@
         <form class="d-flex" action="{% url 'search' %}" method="POST">
             {% csrf_token %}
             <input class="form-control me-2" type="search" name="query" placeholder="Escribí una palabra" value="{{ query }}" aria-label="Search">
+=======
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li class="page-item disabled">
+                    <a class="page-link">⬅</a>
+                </li>
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">➡</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="d-flex justify-content-center" style="margin-bottom: 1%">
+        <!-- Buscador del sitio -->
+        <form class="d-flex" action="{% url 'home' %}" method="POST">
+            {% csrf_token %}
+            <input class="form-control me-2" type="search" name="query" placeholder="Escribí una palabra" aria-label="Search">
+>>>>>>> 5e876d0f40ac7faadccc567c7875634633d27533
             <button class="btn btn-outline-success" type="submit">Buscar</button>
         </form>        
     </div>
@@ -83,6 +114,7 @@
                                 </p>
                                 <p class="card-text"><small class="text-body-secondary">Última ubicación: {{ img.ultima_ubicacion }}</small></p>
                                 <p class="card-text"><small class="text-body-secondary">Episodio inicial: {{ img.episodio_inicial }}</small></p>
+<<<<<<< HEAD
 
                                 <!-- Aquí agregamos el botón de favoritos -->
                                 <form method="POST" action="{% url 'agregar-favorito' %}">
@@ -102,6 +134,8 @@
                                 {% if error %}
                                     <p>{{ error }}</p>
                                  {% endif %}
+=======
+>>>>>>> 5e876d0f40ac7faadccc567c7875634633d27533
                             </div>
                         </div>
                     </div>

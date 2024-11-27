@@ -3,6 +3,7 @@
 from django.shortcuts import redirect, render
 from .layers.services import services
 from django.contrib.auth.decorators import login_required
+<<<<<<< HEAD
 import requests
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
@@ -10,6 +11,11 @@ from django.core.exceptions import ValidationError
 from .layers.persistence.repositories import saveFavourite as save_fav_repo, getAllFavourites as get_favs_repo, deleteFavourite as delete_fav_repo
 from django.contrib.auth import logout
 
+=======
+from django.contrib.auth import logout
+
+
+>>>>>>> 5e876d0f40ac7faadccc567c7875634633d27533
 def home_view(request):
     consulta = request.POST.get('query', None)  
     images = services.getAllImages(consulta)  
@@ -42,6 +48,7 @@ def home(request):
     } for character in data['results']]
 
 
+<<<<<<< HEAD
 
     
     favourite_list = get_favs_repo(request.user)  
@@ -133,3 +140,39 @@ def deleteFavourite(request):
 def exit(request):
     logout(request)  
     return redirect('login')
+=======
+    favourite_list = []
+    
+
+    return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
+
+
+def search(request):
+    search_msg = request.POST.get('query', '')
+
+    # si el texto ingresado no es vacío, trae las imágenes y favoritos desde services.py,
+    # y luego renderiza el template (similar a home).
+    if (search_msg != ''):
+        pass
+    else:
+        return redirect('home')
+
+
+# Estas funciones se usan cuando el usuario está logueado en la aplicación.
+@login_required
+def getAllFavouritesByUser(request):
+    favourite_list = []
+    return render(request, 'favourites.html', { 'favourite_list': favourite_list })
+
+@login_required
+def saveFavourite(request):
+    pass
+
+@login_required
+def deleteFavourite(request):
+    pass
+
+@login_required
+def exit(request):
+    pass
+>>>>>>> 5e876d0f40ac7faadccc567c7875634633d27533
