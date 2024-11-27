@@ -43,20 +43,19 @@ def home(request):
 
 
 
-    # Obtener la lista de favoritos del usuario
-    favourite_list = get_favs_repo(request.user)  # Traemos los favoritos del usuario logueado
+    
+    favourite_list = get_favs_repo(request.user)  
 
     return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
 def search(request):
-    search_msg = request.POST.get('query', '').strip()  # Obtener y limpiar el texto ingresado
+    search_msg = request.POST.get('query', '').strip()  
 
-    if search_msg:  # Si el texto no está vacío
-        # Construir el link de búsqueda en la API
+    if search_msg:  
         link = f'https://rickandmortyapi.com/api/character/?name={search_msg}'
 
         try:
             contenido = requests.get(link)
-            contenido.raise_for_status()  # Lanzar excepción si hay error en la API
+            contenido.raise_for_status()  
             data = contenido.json()
 
             if 'results' in data:
@@ -68,38 +67,34 @@ def search(request):
                     'episodio_inicial': character['origin']['name'] if character['origin'] else 'Desconocido'
                 } for character in data['results']]
             else:
-                images = []  # Si no hay resultados, la lista será vacía
+                images = []  
         except requests.exceptions.RequestException:
-            images = []  # Manejo de errores en caso de falla en la API
+            images = []  
 
         return render(request, 'home.html', {'images': images, 'query': search_msg})
     else:
-        # Si no se ingresó texto, redirigir a `home` para mostrar todo
+       
         return redirect('home')
 
-# Añadir un favorito
-# Función para obtener todos los favoritos del usuario
+
+
 @login_required
 def getAllFavouritesByUser(request):
     favourite_list = get_favs_repo(request.user)
     return render(request, 'favourites.html', {'favourite_list': favourite_list})
 
-# Función para guardar un favorito
-
-
-
 
 @login_required
 def saveFavourite(request):
     if request.method == 'POST':
-        # Obtener los datos del formulario
+        
         url = request.POST.get('url')
         name = request.POST.get('name')
         status = request.POST.get('status')
         last_location = request.POST.get('last_location')
         first_seen = request.POST.get('first_seen')
 
-        # Verificar que todos los datos estén presentes
+        
         if not all([url, name, status, last_location, first_seen]):
             print("Faltan datos:", {
                 'url': url,
@@ -107,29 +102,29 @@ def saveFavourite(request):
                 'status': status,
                 'last_location': last_location,
                 'first_seen': first_seen
-            })  # Imprime los datos recibidos para depurar
+            })  
             return HttpResponseBadRequest("Faltan datos requeridos")
 
-        # Verificar si el personaje ya está en favoritos
+        
         from app.models import(Favourite)
         if Favourite.objects.filter(user=request.user, url=url).exists():
             return HttpResponseBadRequest("Este personaje ya está en tus favoritos")
 
-        # Llamamos al repositorio para guardar el favorito
+        
         saved_fav = save_fav_repo(url, name, status, last_location, first_seen, request.user)
 
         if saved_fav:
-            return redirect('favoritos')  # Redirigir a la página de favoritos después de guardar
+            return redirect('favoritos')  
         else:
             return HttpResponseBadRequest("Error al guardar el favorito")
 
     return HttpResponseBadRequest("Método no permitido")
-# Función para eliminar un favorito
+
 @login_required
 def deleteFavourite(request):
     if request.method == "POST":
         fav_id = request.POST.get('id')
-        # Eliminar el favorito por su ID
+        
         delete_fav_repo(fav_id)
         return redirect('favoritos')
     return HttpResponseBadRequest("Invalid request")
