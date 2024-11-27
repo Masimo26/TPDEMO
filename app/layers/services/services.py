@@ -4,6 +4,7 @@ from ..persistence import repositories
 from ..utilities import translator
 from django.contrib.auth import get_user
 import requests
+from app.layers.persistence.repositories import saveFavourite as save_fav_repo, getAllFavourites as get_favs_repo, deleteFavourite as delete_fav_repo
 
 def conseguirimagenesAPI():
     url = "https://rickandmortyapi.com/api/character" 
@@ -38,25 +39,47 @@ def getAllImages(input=None):
     return images
 
 
-# añadir favoritos (usado desde el template 'home.html')
+def saveFavourite(request, image_data):
+    """Guardar un personaje como favorito"""
+    user = request.user
+
+    image = {
+        'url': image_data['image'],
+        'name': image_data['name'],
+        'status': image_data['status'],
+        'last_location': image_data['location']['name'] if image_data['location'] else 'Desconocido',
+        'first_seen': image_data['origin']['name'] if image_data['origin'] else 'Desconocido',
+        'user': user
+    }
+
+    return save_fav_repo(image)
+
+def getAllFavourites(user):
+    """Obtenemos todos los favoritos de un usuario"""
+    return get_favs_repo(user)
+
+def deleteFavourite(request, fav_id):
+    """Eliminar un favorito por ID"""
+    return delete_fav_repo(fav_id)
+
 def saveFavourite(request):
-    fav = '' # transformamos un request del template en una Card.
-    fav.user = '' # le asignamos el usuario correspondiente.
+    fav = '' 
+    fav.user = '' 
 
-    return repositories.saveFavourite(fav) # lo guardamos en la base.
+    return repositories.saveFavourite(fav) 
 
-# usados desde el template 'favourites.html'
+
 def getAllFavourites(request):
     if not request.user.is_authenticated:
         return []
     else:
         user = get_user(request)
 
-        favourite_list = [] # buscamos desde el repositories.py TODOS los favoritos del usuario (variable 'user').
+        favourite_list = [] 
         mapped_favourites = []
 
         for favourite in favourite_list:
-            card = '' # transformamos cada favorito en una Card, y lo almacenamos en card.
+            card = '' 
             mapped_favourites.append(card)
 
         return mapped_favourites

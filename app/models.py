@@ -14,3 +14,11 @@ class Favourite(models.Model):
 
     class Meta:
         unique_together = (('user', 'url', 'name', 'status', 'last_location', 'first_seen'),)
+
+    def __str__(self):
+        return self.name
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('user', 'url', 'name', 'status', 'last_location', 'first_seen'),)

@@ -4,7 +4,10 @@ from django.shortcuts import redirect, render
 from .layers.services import services
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-
+from django.http import HttpResponseBadRequest
+from django.core.exceptions import ValidationError
+from .layers.persistence.repositories import saveFavourite as save_fav_repo, getAllFavourites as get_favs_repo, deleteFavourite as delete_fav_repo
+import requests
 
 def home_view(request):
     consulta = request.POST.get('query', None)  
@@ -44,15 +47,14 @@ def home(request):
     return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
 
 def search(request):
-    search_msg = request.POST.get('query', '').strip()  # Obtener y limpiar el texto ingresado
+    search_msg = request.POST.get('query', '').strip() 
 
-    if search_msg:  # Si el texto no está vacío
-        # Construir el link de búsqueda en la API
+    if search_msg:  
         link = f'https://rickandmortyapi.com/api/character/?name={search_msg}'
 
         try:
             contenido = requests.get(link)
-            contenido.raise_for_status()  # Lanzar excepción si hay error en la API
+            contenido.raise_for_status() 
             data = contenido.json()
 
             if 'results' in data:
@@ -64,30 +66,72 @@ def search(request):
                     'episodio_inicial': character['origin']['name'] if character['origin'] else 'Desconocido'
                 } for character in data['results']]
             else:
-                images = []  # Si no hay resultados, la lista será vacía
+                images = []  
         except requests.exceptions.RequestException:
-            images = []  # Manejo de errores en caso de falla en la API
+            images = []  
 
         return render(request, 'home.html', {'images': images, 'query': search_msg})
     else:
-        # Si no se ingresó texto, redirigir a `home` para mostrar todo
+        
         return redirect('home')
 
-# Estas funciones se usan cuando el usuario está logueado en la aplicación.
 @login_required
 def getAllFavouritesByUser(request):
-    favourite_list = []
-    return render(request, 'favourites.html', { 'favourite_list': favourite_list })
+    favourite_list = get_favs_repo(request.user)
+    return render(request, 'favourites.html', {'favourite_list': favourite_list})
+
 
 @login_required
 def saveFavourite(request):
-    pass
+    if request.method == 'POST':
+        
+        url = request.POST.get('url')
+        name = request.POST.get('name')
+        status = request.POST.get('status')
+        last_location = request.POST.get('last_location')
+        first_seen = request.POST.get('first_seen')
+
+        
+        if not all([url, name, status, last_location, first_seen]):
+            print("Faltan datos:", {
+                'url': url,
+                'name': name,
+                'status': status,
+                'last_location': last_location,
+                'first_seen': first_seen
+            })  
+            return HttpResponseBadRequest("Faltan datos requeridos")
+
+        
+        from app.models import(Favourite)
+        if Favourite.objects.filter(user=request.user, url=url).exists():
+            return HttpResponseBadRequest("Este personaje ya está en tus favoritos")
+
+        
+        saved_fav = save_fav_repo(url, name, status, last_location, first_seen, request.user)
+
+        if saved_fav:
+            return redirect('favoritos')  
+        else:
+            return HttpResponseBadRequest("Error al guardar el favorito")
+
+    return HttpResponseBadRequest("Método no permitido")
 
 @login_required
 def deleteFavourite(request):
-    pass
+    if request.method == "POST":
+        fav_id = request.POST.get('id')
+        
+        delete_fav_repo(fav_id)
+        return redirect('favoritos')
+    return HttpResponseBadRequest("Invalid request")
 
 @login_required
 def exit(request):
     logout(request)  
     return redirect('login')
+
+    favourite_list = []
+    
+
+    return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
